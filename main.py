@@ -33,8 +33,6 @@ def read_response(ser):
     """Read response from Arduino"""
     if ser and ser.is_open and ser.in_waiting > 0:
         return ser.readline().decode().strip()
-    
-arduino = setup_serial()
 
 
 
@@ -67,12 +65,10 @@ def post_number():
     # Validate
     if not isinstance(value, int):
         return jsonify(error="value must be an integer"), 400
-    if not (0 <= value <= 99):
-        return jsonify(error="value must be between 0 and 99"), 400
     
     # Execute
     print(f"Received number: {value}")
-    send_command(arduino, str(value))
+    send_command(arduino, 'd' + str(value))
     
     return jsonify(ok=True, value=value), 200
 
@@ -90,13 +86,11 @@ def post_led():
     
     # Execute
     print(f"Received LED color: {value}")
-    send_command(arduino, value)
+    send_command(arduino, 'l' + value)
     
     return jsonify(ok=True, value=value), 200
 
 # main driver function
 if __name__ == '__main__':
-
-    # run() method of Flask class runs the application 
-    # on the local development server.
-    app.run()
+    arduino = setup_serial()
+    app.run(host='0.0.0.0', port=5000)
